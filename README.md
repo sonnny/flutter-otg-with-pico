@@ -1,5 +1,8 @@
 demo of connecting a smart phone with pico using otg cable
 
+youtube demo link ------  https://www.youtube.com/watch?v=LawAE_I6GZw
+
+
 things use in this demo:
 
 waveshare rp2040 zero rgb led connected with pin 16
