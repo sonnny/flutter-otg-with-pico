@@ -1,0 +1,56 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import '../controllers/otgcontroller.dart';
+
+final TextStyle myStyle = TextStyle(fontSize:20,fontWeight:FontWeight.bold);
+
+
+class Home extends StatelessWidget{
+const Home({Key? key}) : super(key: key);
+
+@override Widget build(BuildContext context) {
+final OtgController otg = Get.put(OtgController());
+return Scaffold(
+
+appBar: AppBar(title: const Text('OTG demo'),
+  actions: [ IconButton(icon: const Icon(Icons.lightbulb),
+    onPressed:() {Get.isDarkMode
+      ? Get.changeTheme(ThemeData.light())
+      : Get.changeTheme(ThemeData.dark());})]),  
+
+ body: Center(child: Column(children:[
+
+SizedBox(height: 20.0),
+
+Text('plugin pico before starting this app'),
+
+SizedBox(height: 20.0),
+
+ElevatedButton(
+onPressed: otg.connect,
+child: Obx(() => Text('${otg.status.value}',
+style:myStyle))),
+          
+SizedBox(height: 40.0),
+
+ElevatedButton(
+child: Text('red',style:myStyle),
+onPressed:()=>otg.sendData(98)),
+SizedBox(height: 20.0),  
+
+ElevatedButton(
+child: Text('green',style:myStyle),
+onPressed:()=>otg.sendData(114)),
+SizedBox(height: 20.0),
+
+ElevatedButton(
+child: Text('blue',style:myStyle),
+onPressed:()=>otg.sendData(103)),
+SizedBox(height: 20.0),
+
+//Text('button status:',style:myStyle),
+//SizedBox(height:10.0),
+//Obx(()=>Text('${ble.buttonStatus.value}',style:myStyle)),
+ 
+])));}}
