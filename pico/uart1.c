@@ -1,0 +1,67 @@
+/*
+  demo of usb as serial port
+  pico is plug to an otg cable to a flutter app
+  this program expects to received letters
+     'r' or 'g' or 'b'
+     * 
+to create a new pico project:
+* cd /home/sonny/pico/pico-project-generator
+* export PICO_SDK_PATH=/home/sonny/pico/pico-sdk
+* python3 pico_project.py --gui
+* set your board
+* set your directory
+* set your project name
+* click whatever hardware you need
+* 
+* if you need to generate pio header
+*   edit CMakeLists.txt to add below add_executable the line
+pico_generate_pio_header(project_name ${CMAKE_CURRENT_LIST_DIR}/pio_filename.pio)
+* 
+* to compile
+*    cd projects/pico/project name you created
+*    cd build
+*    cmake ..
+*    make
+*    this should generate a .uf2 in the build directory
+*    
+* to move to your pico
+*    press boot button
+*    press reset button if available or
+*       short run pin to ground
+*    let go of reset button
+*    rp2 storage file should appear in file manager
+*    drag and drop the .uf2 file to rp2 storage
+
+
+ inspired by below link
+ * https://github.com/HeadBoffin/Pico-Three-Way-Serial/blob/main/Pico-Three-Way-Serial/Pico-Three-Way-Serial.cpp
+ */
+
+#include <stdio.h>
+#include "pico/stdlib.h"
+#include "pico/stdio.h"
+#include "hardware/gpio.h"
+#include "hardware/uart.h"
+#include "hardware/pio.h"
+#include "hardware/clocks.h"
+#include "ws2812.pio.h"
+
+int main(){
+  stdio_usb_init(); //set up usb as serial port
+  uart_init(uart0, 115200);
+  gpio_set_function(0,GPIO_FUNC_UART);
+  gpio_set_function(1,GPIO_FUNC_UART);
+  
+  PIO pio = pio0;
+  int sm = 0;
+  uint offset = pio_add_program(pio, &ws2812_program);
+  ws2812_program_init(pio, sm, offset, 16, 800000, false);
+  
+  for(;;){
+	  int16_t ch = getchar_timeout_us(100);
+	  while (ch != PICO_ERROR_TIMEOUT){
+		  switch(ch){
+			case 0x62: pio_sm_put_blocking(pio0, 0, 0x00100000); break;		
+			case 0x67: pio_sm_put_blocking(pio0, 0, 0x00001000); break;
+			case 0x72: pio_sm_put_blocking(pio0, 0, 0x10000000); break;}
+		  ch = getchar_timeout_us(100);}}}
