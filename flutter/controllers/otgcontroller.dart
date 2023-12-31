@@ -1,0 +1,31 @@
+import 'package:flutter/material.dart';
+import 'package:usb_serial/transaction.dart';
+import 'package:usb_serial/usb_serial.dart';
+import 'package:get/get.dart';
+import 'dart:async';
+import 'dart:typed_data';
+import 'dart:convert';
+import 'dart:io';
+
+class OtgController {
+
+  var _port;
+  var status = 'connect to pico'.obs;
+  
+void sendData(val) async {
+  await _port!.write(Uint8List.fromList([val]));}
+
+void connect() async {
+  status.value = 'connecting...';
+  List <UsbDevice> devices = await UsbSerial.listDevices();
+  if ( devices.length == 0 ) {return;}
+  _port = await devices[0].create();
+      
+  if (!await _port.open()) {return;}
+  await _port.setDTR(true);
+  await _port.setRTS(true);
+  await _port.setPortParameters(
+  115200, UsbPort.DATABITS_8, UsbPort.STOPBITS_1, UsbPort.PARITY_NONE);
+  status.value = 'connected';}
+  
+}
